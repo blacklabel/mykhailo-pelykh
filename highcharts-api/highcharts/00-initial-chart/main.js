@@ -59,30 +59,4 @@ const chartOptions = {
     }]
 }
 
-Dashboards.board('container', {
-    gui: {
-        layouts: [{
-            id: 'main-layout',
-            rows: [{
-                cells: [{
-                    id: 'main-dashboard'
-                }]
-            }]
-        }]
-    },
-    editMode: {
-        enabled: true,
-        contextMenu: {
-            enabled: true,
-            items: ['editMode'],
-            icon: 'https://code.highcharts.com/dashboards/4.2.0/gfx/dashboards-icons/menu.svg'
-        }
-    },
-    components: [
-        {
-            renderTo: 'main-dashboard',
-            type: 'Highcharts',
-            chartOptions
-        }
-    ] 
-})
+Highcharts.chart('container', chartOptions);
