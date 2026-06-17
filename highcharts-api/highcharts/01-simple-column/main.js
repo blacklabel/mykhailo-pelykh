@@ -1,13 +1,14 @@
 const cityNames = ['Tokyo', 'New York', 'London'];
 
-const yRangeMin = 0;
-const yRangeMax = 9;
-let yHighest = 0;
+const maxY = 9;
+let highestY = 0;
 
-const seriesData = cityNames.map(city => {
-    const cityData = Array.from({ length: 3 }, () => {
-        const value = Math.floor(Math.random() * (yRangeMax - yRangeMin + 1)) + yRangeMin;
-        if (value > yHighest) yHighest = value;
+const seriesDataLength = 3;
+
+const series = cityNames.map(city => {
+    const cityData = Array.from({ length: seriesDataLength }, () => {
+        const value = Math.floor(Math.random() * (maxY + 1));
+        if (value > highestY) highestY = value;
         return value;
     });
 
@@ -25,12 +26,12 @@ const chartOptions = {
         categories: ['Jan', 'Feb', 'Mar']
     },
     yAxis: {
-        max: yHighest,
-        softMax: yHighest * 2,
+        max: highestY,
+        softMax: highestY * 2,
         plotLines: [{
             color: 'green',
             dashStyle: 'Dash',
-            value: yHighest * 1.5,
+            value: highestY * 1.5,
             width: 3
         }]
     },
@@ -39,14 +40,14 @@ const chartOptions = {
             dataLabels: {
                 enabled: true,
                 formatter: function () {
-                    if (this.y === yHighest) {
+                    if (this.y === highestY) {
                         return 'max';
                     }
                 }
             }
         }
     },
-    series: seriesData
+    series
 }
 
 Highcharts.chart('container', chartOptions);
