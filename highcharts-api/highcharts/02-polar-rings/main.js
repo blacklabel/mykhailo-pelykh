@@ -19,9 +19,37 @@ const series = cityNames.map(city => {
     }
 });
 
+const chartEvents = {
+    render: function() {
+        const chart = this;
+
+        if (chart.customCircle) {
+            chart.customCircle.destroy();
+        }
+
+        const ren = chart.renderer;
+        const yAxis = chart.yAxis[0],
+            yAxisStepSize = yAxis.len / yAxis.dataMax;
+            centerX = chart.plotLeft + (chart.plotWidth / 2),
+            centerY = chart.plotTop + (chart.plotHeight / 2);
+
+        const circle = ren.circle(centerX, centerY, yAxisStepSize * maxY / 2)
+            .attr({
+                stroke: 'red',
+                fill: 'none',
+                'stroke-width': 2,
+                zIndex: 3
+            })
+            .add();
+
+        chart.customCircle = circle;
+    }
+}
+
 const chartOptions = {
     chart: {
-        polar: true
+        polar: true,
+        events: chartEvents
     },
     title: {
         text: 'Chart Title'
@@ -31,7 +59,6 @@ const chartOptions = {
         endAngle: 360
     },
     xAxis: {
-        tickInterval: 1,
         min: 0,
         max: 3,
         lineWidth: 2,
@@ -40,13 +67,14 @@ const chartOptions = {
     yAxis: {
         max: highestY,
         softMax: highestY * 2,
-        
         plotLines: [{
             color: 'green',
             value: highestY * 2
-        }, {
-            color: 'red',
-            value: highestY * 1.5
+        }],
+        plotBands: [{
+            from: 8,
+            to: 8.3,
+            color: 'orange'
         }]
     },
     plotOptions: {
@@ -64,4 +92,4 @@ const chartOptions = {
     series
 }
 
-Highcharts.chart('container', chartOptions);
+const chart = Highcharts.chart('container', chartOptions);
