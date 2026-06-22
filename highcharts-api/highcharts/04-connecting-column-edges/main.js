@@ -38,7 +38,7 @@ const chartEvents = {
                     .attr({
                         stroke: series.color,
                         'stroke-width': connectorsWidth,
-                        zIndex: 3
+                        zIndex: 2
                     })
                     .add();
 
