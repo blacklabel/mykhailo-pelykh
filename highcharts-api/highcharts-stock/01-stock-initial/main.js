@@ -3,10 +3,9 @@
     'https://demo-live-data.highcharts.com/aapl-ohlcv.json'
   ).then((response) => response.json());
 
-  const close = [],
-        dataLength = data.length;
+  const close = [];
 
-  for (let i = 0; i < dataLength; i += 1) {
+  for (let i = 0; i < data.length; i++) {
     close.push([
       data[i][0], // date
       data[i][4]  // close price
