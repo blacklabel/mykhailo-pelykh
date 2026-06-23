@@ -13,5 +13,85 @@ const data = [
 ];
 
 Dashboards.board('container', {
-    
+    dataPool: {
+        connectors: [{
+            id: 'products',
+            type: 'JSON',
+            data,
+            dataModifier: {
+                type: 'Sort',
+                direction: 'asc',
+                orderByColumn: 'weight'
+            }
+        }]
+    },
+    gui: {
+        layouts: [{
+            id: 'main-layout',
+            rows: [{
+                cells: [{
+                    id: 'left-cell'
+                }, {
+                    id: 'right-cell'
+                }]
+            }]
+        }]
+    },
+    components: [{
+        type: 'Highcharts',
+        renderTo: 'left-cell',
+        sync: {
+            highlight: true
+        },
+        connector: {
+            id: 'products',
+            columnAssignment: [{
+                seriesId: 'weight',
+                data: {
+                    name: 'product',
+                    y: 'weight'
+                }
+            }, {
+                seriesId: 'price',
+                data: ['price']
+            }]
+        },
+        chartOptions: {
+            title: {
+                text: null
+            },
+            chart: {
+                type: 'bar'
+            },
+            xAxis: {
+                type: 'category'
+            },
+            yAxis: [{
+                title: { text: 'Weight (g)' }
+            }, {
+                title: { text: 'Price (EUR)' },
+                opposite: true
+            }],
+            series: [{
+                type: 'bar',
+                name: 'Weight',
+                id: 'weight',
+            }, {
+                type: 'spline',
+                name: 'Price',
+                id: 'price',
+                yAxis: 1,
+                color: 'red'
+            }]
+        }
+    }, {
+        type: 'Grid',
+        renderTo: 'right-cell',
+        sync: {
+            highlight: true
+        },
+        connector: {
+            id: 'products'
+        }
+    }]
 });
