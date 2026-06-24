@@ -1,5 +1,3 @@
-const categories = ['Data', 'Emails', 'Duplicates', 'Support'];
-
 const buttonAttrs = {
     height: 6,
     zIndex: 10,
@@ -48,7 +46,6 @@ Highcharts.chart('container', {
     },
     xAxis: {
         type: 'category',
-        categories,
         lineWidth: 0,
         gridLineWidth: 1
     },
