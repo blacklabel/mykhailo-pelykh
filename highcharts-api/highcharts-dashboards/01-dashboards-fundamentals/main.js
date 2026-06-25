@@ -60,9 +60,6 @@ Dashboards.board('container', {
             title: {
                 text: null
             },
-            chart: {
-                type: 'bar'
-            },
             xAxis: {
                 type: 'category'
             },
