@@ -1,42 +1,59 @@
-const buttonAttrs = {
-    height: 6,
-    zIndex: 10,
-    stroke: 'blue',
-};
-const buttonCSS = { 'font-size': '13px' };
-const labelCSS = { 'font-size': '10px' };
-
-const chartEvents = {
-    render: function() {
-        const chart = this;
-
-        if (chart.svgElements) {
-            chart.svgElements.forEach(e => e.destroy());
-        }
-        chart.svgElements = [];
-
-        const buttons = addButtons(chart);
-        chart.svgElements.push(...buttons);
-
-        const labels = addLabels(chart);
-        chart.svgElements.push(...labels);
-    }
-}
+const categories = ['Data', 'Emails', 'Duplicates', 'Support'];
 
 Highcharts.chart('container', {
-    dataTable: {
-        columns: {
-            Categories: ['Data', 'Emails', 'Duplicates', 'Support'],
-            Orange: [100, 130, 35, 30],
-            Green: [15, 0, 15, 10],
-            Blue: [110, 110, 30],
-            Red: [15, 0, 10, 5]
-        }
-    },
     chart: {
         type: 'bar',
-        events: chartEvents,
-        marginTop: 20
+        marginTop: 20,
+        events: {
+            load: function() {
+                const chart = this;
+
+                chart.customLabels = [];
+                chart.customButtons = [];
+            },
+            render: function() {
+                const chart = this;
+                const { renderer, series, xAxis, customLabels, customButtons } = chart;
+
+                // Add buttons
+                series[0].points.forEach((point, i) => {
+                    if (!customButtons[i]) {
+                        customButtons[i] = renderer
+                            .button('How to fix', 0, 0, function () {}, {
+                                height: 6,
+                                zIndex: 10,
+                                stroke: 'blue',
+                            })
+                            .css({ 'font-size': '13px' })
+                            .add();
+                    }
+
+                    const pointWidth = point.shapeArgs.width;
+                    const pointX = chart.plotTop + point.shapeArgs.x;
+
+                    customButtons[i].attr({
+                        x: chart.plotWidth,
+                        y: pointX + pointWidth / 2 - customButtons[i].height / 2
+                    });
+                });
+
+                // Add labels
+                if (customLabels.length == 0) {
+                    customLabels.push(
+                        ...['Issue', 'Record Count', 'Action']
+                        .map(title =>
+                            renderer.label(title, 0, chart.plotTop - 25)
+                                .css({ 'font-size': '10px' })
+                                .add()
+                        )
+                    );
+                }
+
+                customLabels[0].attr({ x: 3 });
+                customLabels[1].attr({ x: chart.plotLeft - 3 });
+                customLabels[2].attr({ x: chart.plotWidth });
+            }
+        }
     },
     title: {
         text: null
@@ -45,9 +62,9 @@ Highcharts.chart('container', {
         enabled: false
     },
     xAxis: {
-        type: 'category',
         lineWidth: 0,
-        gridLineWidth: 1
+        gridLineWidth: 1,
+        categories
     },
     yAxis: {
         title: { text: 'Amount' },
@@ -55,88 +72,21 @@ Highcharts.chart('container', {
         gridLineWidth: 0,
         stackLabels: {
             enabled: true,
-            formatter: function() {
-                return this.total + ' K';
-            }
+            format: '{total} K'
         }
     },
     plotOptions: {
         series: {
-            dataMapping: {
-                name: 'Categories'
-            },
             stacking: 'normal'
         }
     },
     series: [{
-        dataMapping: {
-            y: 'Orange'
-        }
+        data: [100, 130, 35, 30],
     }, {
-        dataMapping: {
-            y: 'Green'
-        }
+        data: [15, 0, 15, 10],
     }, {
-        dataMapping: {
-            y: 'Blue'
-        }
+        data: [110, 110, 30, 40]
     }, {
-        dataMapping: {
-            y: 'Red'
-        }
+       data: [15, 0, 10, 5]
     }]
 });
-
-function addLabels(chart) {
-    const labelY = -5;
-    const label1X = 3,
-          label2X = chart.plotLeft - 3,
-          label3X = chart.plotWidth;
-
-    const label1 = chart.renderer
-        .label('Issue', label1X, labelY)
-        .css(labelCSS)
-        .add();
-
-    const label2 = chart.renderer
-        .label('Record Count', label2X, labelY)
-        .css(labelCSS)
-        .add();
-
-    const label3 = chart.renderer
-        .label('Action', label3X, labelY)
-        .css(labelCSS)
-        .add();
-
-    return [label1, label2, label3];
-}
-
-function addButtons(chart) {
-    const buttonX = chart.plotWidth;
-    const buttons = [];
-
-    chart.series[0].points.forEach((point, i) => {
-        const pointX = chart.plotTop + point.shapeArgs.x;
-        const pointWidth = point.shapeArgs.width;
-
-        const button = chart.renderer
-            .button(
-                'How to fix',
-                buttonX,
-                pointX,
-                function () {},
-                buttonAttrs
-            )
-            .css(buttonCSS)
-            .add();
-
-        buttons.push(button);
-
-        // You can only get correct button height after it was rendered.
-        button.attr({
-            y: pointX + pointWidth / 2 - button.height / 2
-        });
-    });
-
-    return buttons;
-}
