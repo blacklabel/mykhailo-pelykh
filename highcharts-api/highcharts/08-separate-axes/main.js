@@ -1,157 +1,71 @@
 const categories = [ 'Dep1', 'Dep2', 'Dep3', 'Dep4', 'Dep5' ];
-const yMaxValue = 100;
-const halfWidth = 45; // Width(%) of one chart half.
-
-
-class SvgElement {
-    constructor(chart) {
-        if (new.target === SvgElement) {
-            throw new Error('"SvgElement" is abstract.');
-        }
-        this.svg = null;
-        this.chart = chart;
-    }
-    create() { throw new Error('"SvgElement.create" must be implemented.'); }
-    update() { throw new Error('"SvgElement.update" must be implemented.'); }
-    destroy() { this.svg?.destroy(); }
-}
-
-class SvgAxisTitle extends SvgElement {
-    static css = {
-        'font-size': '12px',
-        'font-weight': 'bold',
-    }
-
-    constructor(chart, title) {
-        super(chart);
-        this.title = title;
-        this.y = 3;
-    }
-
-    getXY() {
-        const { chart } = this;
-        const x = chart.plotLeft + (chart.plotWidth * halfWidth / 2 / 100);
-
-        return { x, y: this.y }
-    }
-
-    create() {
-        const { chart } = this;
-        const { x, y } = this.getXY();
-
-        this.svg = chart.renderer
-            .label(this.title, x, y)
-            .css(SvgAxisTitle.css)
-            .add();
-
-        this.update();
-        return this;
-    }
-
-    update() {
-        const { x, y } = this.getXY();
-
-        this.svg.attr({
-            x: x - this.svg.width / 2,
-            y
-        });
-
-        return this;
-    }
-}
-
-class SvgAxisTitleRight extends SvgAxisTitle {
-    getXY() {
-        const { chart } = this;
-        const rightHalfOffset = 100 - halfWidth;
-        const x = chart.plotLeft +
-                  (chart.plotWidth * (rightHalfOffset + halfWidth / 2) / 100);
-
-        return { x, y: this.y }
-    }
-}
-
-class SvgBarLabel extends SvgElement {
-    static css = {
-        color: 'gray',
-        'font-size': '12px'
-    }
-
-    constructor(chart, point) {
-        super(chart);
-        this.point = point;
-    }
-
-    getXY() {
-        const { chart, point } = this;
-        const { shapeArgs } = point;
-
-        const x = chart.plotLeft + chart.plotWidth / 2,
-            y = shapeArgs.x + chart.plotTop + shapeArgs.width / 2;
-
-        return { x, y };
-    }
-
-    create() {
-        const { x, y } = this.getXY();
-
-        this.svg = this.chart.renderer
-            .label(this.point.category, x, y)
-            .css(SvgBarLabel.css)
-            .add();
-
-        this.update();
-        return this;
-    }
-
-    update() {
-        const { svg } = this;
-        const { x, y } = this.getXY();
-
-        svg.attr({
-            x: x - svg.width / 2,
-            y: y - svg.height / 2
-        });
-
-        return this;
-    }
-}
-
+const yAxisMax = 100;
+const axisWidth = 45;
 
 const chartEvents = {
-    render: function() {
+    load: function() {
         const chart = this;
 
-        if (chart.svgElements) {
-            chart.svgElements.forEach(e => e.update());
-            return;
-        }
+        chart.customAxisLabels = [
+            { text: 'Manegrial Position', axis: 0 },
+            { text: 'Non Manegrial Position', axis: 1 },
+        ];
 
-        chart.svgElements = [];
+        chart.customBarLabels = categories.map(c => ({ text: c }));
+    },
 
-        chart.series[0].points.forEach(point => {
-            const label = new SvgBarLabel(chart, point);
-            label.create();
-            chart.svgElements.push(label);
+    render: function() {
+        const chart = this;
+        const {
+            renderer, customAxisLabels, customBarLabels, plotLeft, plotTop, plotWidth
+        } = chart;
+
+        // Create bar labels
+        chart.series[0].points.forEach((point, i) => {
+            const { shapeArgs } = point;
+            const l = customBarLabels[i];
+            const x = plotLeft + plotWidth / 2;
+            const y = shapeArgs.x + plotTop + shapeArgs.width / 2;
+
+            if (!l.element) {
+                l.element = renderer.label(l.text, 0, 0)
+                    .css({
+                        color: 'gray',
+                        'font-size': '12px'
+                    })
+                    .add();
+            }
+
+            l.element.attr({
+                x: x - l.element.width / 2,
+                y: y - l.element.height / 2
+            });
         });
 
-        const leftAxisTitle = new SvgAxisTitle(
-            chart,
-            'Manegrial Position'
-        ).create();
+        // Create axis labels
+        customAxisLabels.forEach(l => {
+            if (!l.element) {
+                l.element = renderer.label(l.text, 0, 0)
+                    .css({
+                        'font-size': '12px',
+                        'font-weight': 'bold',
+                    })
+                    .add();
+            }
 
-        chart.svgElements.push(leftAxisTitle);
+            const rightOffsetX = l.axis ? (100 - axisWidth) : 0;
+            const midX = plotLeft + (plotWidth * (rightOffsetX + axisWidth / 2) / 100);
 
-        const rightAxisTitle = new SvgAxisTitleRight(
-            chart,
-            'Non Manegrial Position'
-        ).create();
+            const x = midX - l.element.width / 2,
+                  y = 3;
 
-        chart.svgElements.push(rightAxisTitle);
+            l.element.attr({ x, y });
+        });
     },
 
     destroy: function() {
-        this.svgElements?.forEach(e => e.destroy());
+        this.customAxisLabels?.forEach(l => l.element?.destroy());
+        this.customBarLabels?.forEach(l => l.element?.destroy());
     }
 };
 
@@ -163,15 +77,15 @@ Highcharts.chart('container', {
     },
     title: false,
     yAxis: [{
-        width: `${halfWidth}%`,
-        max: yMaxValue,
+        width: `${axisWidth}%`,
+        max: yAxisMax,
         reversed: true,
         title: { text: null }
     }, {
-        width: `${halfWidth}%`,
-        left: `${100 - halfWidth}%`,
+        width: `${axisWidth}%`,
+        left: `${100 - axisWidth}%`,
         offset: 0,
-        max: yMaxValue,
+        max: yAxisMax,
         title: { text: null }
     }],
     xAxis: {
@@ -199,7 +113,7 @@ Highcharts.chart('container', {
     series: [{
         yAxis: 0,
         name: 'Manegrial Background',
-        data: Array(5).fill(yMaxValue),
+        data: Array(categories.length).fill(yAxisMax),
         color: 'lightgray',
         enableMouseTracking: false,
         states: { hover: { enabled: false } }
@@ -221,7 +135,7 @@ Highcharts.chart('container', {
     }, {
         yAxis: 1,
         name: 'Non Manegrial Background',
-        data: Array(5).fill(yMaxValue),
+        data: Array(categories.length).fill(yAxisMax),
         color: 'lightgray',
         enableMouseTracking: false,
         states: { hover: { enabled: false } }
