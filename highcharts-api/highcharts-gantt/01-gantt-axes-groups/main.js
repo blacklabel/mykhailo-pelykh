@@ -1,8 +1,6 @@
-Highcharts.ganttChart('container', {
+const chart = Highcharts.ganttChart('container', {
     xAxis: [{
         units: [['day']],
-        min: '2019-06-19 00:00',
-        max: '2019-06-24 23:59',
         breaks: [{
             from: '2019-06-19 23:59',
             to: '2019-06-24 00:00'
@@ -16,7 +14,9 @@ Highcharts.ganttChart('container', {
     series: [{
         name: 'Project 1',
         data: [{
-            name: 'Main'
+            name: 'Main',
+            start: '2019-06-19 00:00',
+            pointWidth: 0
         }, {
             name: 'First',
             start: '2019-06-19 00:00',
