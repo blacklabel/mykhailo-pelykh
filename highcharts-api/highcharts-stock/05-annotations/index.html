@@ -2,16 +2,35 @@
 
 <head>
 
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://code.highcharts.com/css/annotations/popup.css">
+
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/modules/annotations-advanced.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
 </head>
 
 <body>
-  <div id="container"></div>
+    <div id="container"></div>
+    <div id="controls">
+        <label for="x1">x1:</label>
+        <input type="date" id="x1" class="x-input">
+
+        <label for="y1">y1:</label>
+        <input type="number" id="y1" class="y-input">
+
+        <label for="x2">x2:</label>
+        <input type="date" id="x2" class="x-input">
+
+        <label for="y2">y2:</label>
+        <input type="number" id="y2" class="y-input">
+
+        <button type="button" class="add-line">Add line</button>
+    </div>
 </body>
 
 <script src="main.js"></script>
