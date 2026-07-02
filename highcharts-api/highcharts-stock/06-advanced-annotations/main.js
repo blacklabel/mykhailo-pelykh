@@ -23,7 +23,6 @@
                                     x,
                                     y
                                 },
-                                draggable: true,
                                 width: 360,
                                 height: 60,
                                 fill: 'red'
@@ -39,15 +38,13 @@
                                 y: 30,
                                 shape: 'rect',
                                 text: Math.trunc(y),
-                                align: 'center',
                                 verticalAlign: 'middle'
                             }],
                             events: {
                                 drag: function() {
                                     const label = this.labels[0];
                                     const rectY = this.shapes[0].points[0].y;
-                                    label.options.text = Math.trunc(rectY);
-                                    label.redraw(false);
+                                    label.update({ text: Math.trunc(rectY) });
                                 }
                             }
                         });
