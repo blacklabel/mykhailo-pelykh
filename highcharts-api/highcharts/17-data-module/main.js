@@ -63,8 +63,6 @@ const chart = Highcharts.chart('container', {
         top: '55%',
         offset: 0,
         lineWidth: 2,
-        max: 24 * 60,
-        tickInterval: 60,
         labels: {
             formatter() {
                 return toTimeStr(this.value);
@@ -100,7 +98,15 @@ const chart = Highcharts.chart('container', {
                 type: 'columnrange',
                 name: 'rainfall',
                 pointStart: 0,
-                data: []
+                data: [],
+                tooltip: {
+                    pointFormatter() {
+                        return `
+                            <span style="color:${this.color}">●</span>
+                            ${this.series.name}: <b>${toTimeStr(this.low)} – ${toTimeStr(this.high)}</b><br/>
+                        `;
+                    }
+                }
             };
 
             options.series.forEach(s => {
