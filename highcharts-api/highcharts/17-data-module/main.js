@@ -29,17 +29,19 @@ const chart = Highcharts.chart('container', {
                         });
 
                         temperatureSeries[currentTUnit].hide();
-
                         currentTUnit ^= 1;
-
-                        this.attr({
-                            text: T_UNITS[currentTUnit]
-                        });
-                        chart.yAxis[0].axisTitle.attr({
-                            text: T_UNITS[currentTUnit]
-                        });
-
                         temperatureSeries[currentTUnit].show();
+
+                        this.attr({ text: T_UNITS[currentTUnit] });
+
+                        chart.yAxis[0].update({
+                            title: {
+                                text: T_UNITS[currentTUnit]
+                            },
+                            labels: {
+                                format: `{value}°${T_UNITS[currentTUnit]}`
+                            }
+                        });
                     })
                     .add();
             }
@@ -53,9 +55,7 @@ const chart = Highcharts.chart('container', {
         height: '45%',
         lineWidth: 2,
         labels: {
-            formatter() {
-                return this.value + '°' + T_UNITS[currentTUnit];
-            }
+            format: `{value}°${T_UNITS[currentTUnit]}`
         }
     }, {
         title: { text: 'Rainfall' },
