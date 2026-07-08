@@ -26,9 +26,9 @@
                     chart.addSeries({
                         type: 'mapline',
                         enableMouseTracking: false,
-                        color: '#e27800',
                         lineWidth: 2,
                         data: [{
+                            color: '#e27800',
                             geometry: {
                                 type: 'LineString',
                                 coordinates: [
