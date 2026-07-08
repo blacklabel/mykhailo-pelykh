@@ -42,7 +42,7 @@
                         }]
                     });
 
-                    // Custom SVG
+                    // Custom SVG label
                     chart.customLabel = chart.renderer
                         .label('SVG', 0, 0)
                         .attr({ zIndex: 3 })
@@ -50,9 +50,29 @@
                         .add();
 
                     chart.customLabel.coords = { x: -64, y: -20 };
+
+                    // Custom SVG circle
+                    const r = 6;
+                    chart.customCircle = chart.renderer
+                        .circle(0, 0, r)
+                        .attr({
+                            stroke: '#424242',
+                            fill: '#ffffff92',
+                            zIndex: 3
+                        })
+                        .css({
+                            pointerEvents: 'none'
+                        })
+                        .add();
+
+                    chart.customCircle.baseR = r;
+                    chart.customCircle.lonLat = {
+                        lat: -6.18953,
+                        lon: 35.76462
+                    }
                 },
                 render() {
-                    const { mapView, customLabel, plotLeft, plotTop } = this;
+                    const { mapView, customLabel, customCircle, plotLeft, plotTop } = this;
 
                     // Update custom label.
                     if (customLabel) {
@@ -61,6 +81,18 @@
                         customLabel.attr({
                             x: x + plotLeft - customLabel.width / 2,
                             y: y + plotTop - customLabel.height / 2
+                        });
+                    }
+
+                    // Update custom circle.
+                    if (customCircle) {
+                        const projected = mapView.lonLatToProjectedUnits(customCircle.lonLat);
+                        const { x, y } = mapView.projectedUnitsToPixels(projected);
+
+                        customCircle.attr({
+                            x: x + plotLeft,
+                            y: y + plotTop,
+                            r: customCircle.baseR * mapView.zoom
                         });
                     }
                 }
@@ -121,19 +153,6 @@
                         chart.mapView.fitToBounds(currentPoint.bounds);
                     }
                 }
-            },
-            {
-                type: 'mapbubble',
-                maxSize: 30,
-                enableMouseTracking: false,
-                color: '#ffffff92',
-                data: [{
-                    name: 'Dodoma',
-                    lat: -6.18953,
-                    lon: 35.76462,
-                    z: 10
-                }]
-
             },
             {
                 type: 'mappoint',
