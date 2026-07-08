@@ -16,15 +16,12 @@ Highcharts.ganttChart('container', {
     },
     xAxis: {
         units: [['day']],
-        labels: {
-            formatter: function () {
-                return `Day ${Math.floor((this.value - dateMin) / day) + 1}`;
-            }
+        dateTimeLabelFormats: {
+            day: 'Day %e'
         }
     },
     navigator: {
-        enabled: true,
-        liveRedraw: false
+        enabled: true
     },
     plotOptions: {
         series: {
@@ -86,7 +83,10 @@ Highcharts.ganttChart('container', {
             drilldown: 'norway-brazil-flight-full',
             parent: 'international-flights',
             dependency: ['flights', 'international-flights'],
-            color: 'orange',
+            dragDrop: {
+                draggableX: false
+            },
+            color: '#f5deb2',
             start: Date.UTC(2024, 0, 5),
             end: Date.UTC(2024, 0, 8)
         }]
@@ -99,13 +99,13 @@ Highcharts.ganttChart('container', {
             data: [{
                 name: 'Norway - Spain',
                 id: 'norway-spain-flight',
-                color: 'orange',
+                color: '#f5deb2',
                 start: Date.UTC(2024, 0, 5),
                 end: Date.UTC(2024, 0, 6)
             }, {
                 name: 'Spain - Brazil',
                 id: 'spain-brazil-flight',
-                color: 'orange',
+                color: '#f5deb2',
                 start: Date.UTC(2024, 0, 6),
                 end: Date.UTC(2024, 0, 8)
             }]
